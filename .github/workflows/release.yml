@@ -26,9 +26,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Si la descarga falla (por ejemplo, justo tras publicarse una versión nueva de .NET),
+      # se sigue con el SDK que ya trae la imagen de Windows; global.json valida que sirva.
       - uses: actions/setup-dotnet@v5
+        continue-on-error: true
         with:
           global-json-file: global.json
+
+      - name: SDK de .NET en uso
+        run: dotnet --version
 
       - name: Obtener versión
         id: version
