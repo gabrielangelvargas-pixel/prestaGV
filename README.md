@@ -7,7 +7,7 @@ calendario de cuotas y registro de pagos. Se distribuye con un instalador que se
 
 | Parte | Tecnología |
 | --- | --- |
-| Aplicación | .NET 10 (LTS) + WPF, patrón MVVM con CommunityToolkit.Mvvm |
+| Aplicación | .NET 10 (LTS) + WPF, MVVM con CommunityToolkit.Mvvm, Material Design (MaterialDesignInXAML) |
 | Datos | SQLite local con Entity Framework Core 10 y migraciones |
 | Instalador y actualizaciones | [Velopack](https://velopack.io), publicado en GitHub Releases |
 | CI/CD | GitHub Actions |
@@ -21,6 +21,7 @@ src/
   PrestaGV.App/     Aplicación WPF (ventanas, view models y servicio de actualizaciones)
 tests/
   PrestaGV.Core.Tests/  Pruebas de cálculos, pagos y base de datos (xUnit)
+  PrestaGV.App.Tests/   Comprueba en Windows que la ventana y sus estilos cargan
 .github/workflows/
   ci.yml            Compila y prueba en cada push y pull request
   release.yml       Genera el instalador y publica la versión al crear una etiqueta v*
