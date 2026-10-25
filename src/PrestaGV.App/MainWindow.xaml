@@ -58,7 +58,7 @@
                                 <DataGridTextColumn Header="Nombre" Binding="{Binding NombreCompleto}" Width="*" />
                                 <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="120" />
                                 <DataGridTextColumn Header="Correo" Binding="{Binding Email}" Width="180" />
-                                <DataGridTextColumn Header="Registro" Binding="{Binding FechaRegistro, StringFormat=d}" Width="100" />
+                                <DataGridTextColumn Header="Registro" Binding="{Binding FechaRegistro, StringFormat=dd/MM/yyyy}" Width="100" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>
@@ -126,7 +126,7 @@
                         <DataGrid Grid.Row="2" ItemsSource="{Binding Ejemplo}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
-                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence}" />
+                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
                                 <DataGridTextColumn Header="Capital" Binding="{Binding Capital, StringFormat=N2}" />
                                 <DataGridTextColumn Header="Interés" Binding="{Binding Interes, StringFormat=N2}" />
                                 <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" Width="*" />
@@ -165,7 +165,7 @@
                         <DataGrid ItemsSource="{Binding VistaPrevia}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
-                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence}" />
+                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
                                 <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" Width="*" />
                             </DataGrid.Columns>
                         </DataGrid>
@@ -187,7 +187,7 @@
                                 <DataGridTextColumn Header="Interés %" Binding="{Binding InteresTotalPorcentaje}" />
                                 <DataGridTextColumn Header="Cuotas" Binding="{Binding NumeroCuotas}" />
                                 <DataGridTextColumn Header="Cada" Binding="{Binding DiasEntreCuotas, StringFormat={}{0} días}" />
-                                <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio}" />
+                                <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy}" />
                                 <DataGridTextColumn Header="Saldo" Binding="{Binding SaldoPendiente, StringFormat=N2}" />
                                 <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />
                             </DataGrid.Columns>
@@ -203,7 +203,7 @@
                         <DataGrid Grid.Row="2" ItemsSource="{Binding CuotasSeleccionado}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
-                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence}" />
+                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
                                 <DataGridTextColumn Header="Capital" Binding="{Binding Capital, StringFormat=N2}" />
                                 <DataGridTextColumn Header="Interés" Binding="{Binding Interes, StringFormat=N2}" />
                                 <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" />
