@@ -1,0 +1,70 @@
+# Publica una versión nueva al crear una etiqueta, por ejemplo:
+#   git tag v0.2.0 && git push origin v0.2.0
+# Genera el instalador (PrestaGV-win-Setup.exe) y los paquetes de actualización con Velopack
+# y los sube a GitHub Releases, de donde la app instalada descarga las actualizaciones.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  VPK_VERSION: 1.2.161 # debe coincidir con la versión del paquete Velopack de PrestaGV.App
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Obtener versión de la etiqueta
+        id: version
+        shell: bash
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Pruebas
+        run: dotnet test -c Release
+
+      - name: Publicar aplicación
+        run: >
+          dotnet publish src/PrestaGV.App/PrestaGV.App.csproj
+          -c Release -r win-x64 --self-contained
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish
+
+      - name: Instalar Velopack CLI
+        run: dotnet tool install -g vpk --version ${{ env.VPK_VERSION }}
+
+      # Descarga la versión anterior para generar paquetes delta (actualizaciones más pequeñas).
+      # En la primera release no hay nada que descargar.
+      - name: Descargar release anterior
+        continue-on-error: true
+        run: vpk download github --repoUrl ${{ github.server_url }}/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
+
+      # Para firmar el instalador con Azure Trusted Signing, añade aquí
+      # --azureTrustedSignFile <archivo-de-metadatos.json> y las credenciales de Azure como secretos.
+      - name: Empaquetar con Velopack
+        run: >
+          vpk pack
+          --packId PrestaGV
+          --packTitle PrestaGV
+          --packAuthors PrestaGV
+          --packVersion ${{ steps.version.outputs.version }}
+          --packDir publish
+          --mainExe PrestaGV.exe
+
+      - name: Subir a GitHub Releases
+        run: >
+          vpk upload github
+          --repoUrl ${{ github.server_url }}/${{ github.repository }}
+          --token ${{ secrets.GITHUB_TOKEN }}
+          --tag ${{ github.ref_name }}
+          --releaseName "PrestaGV ${{ steps.version.outputs.version }}"
+          --publish
