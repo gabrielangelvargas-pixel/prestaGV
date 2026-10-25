@@ -1,5 +1,6 @@
-# Publica una versión nueva al crear una etiqueta, por ejemplo:
-#   git tag v0.2.0 && git push origin v0.2.0
+# Publica una versión nueva de dos formas:
+#   - Desde GitHub: Actions > Release > Run workflow, indicando la versión (por ejemplo 0.2.0).
+#   - Con una etiqueta: git tag v0.2.0 && git push origin v0.2.0
 # Genera el instalador (PrestaGV-win-Setup.exe) y los paquetes de actualización con Velopack
 # y los sube a GitHub Releases, de donde la app instalada descarga las actualizaciones.
 name: Release
@@ -7,6 +8,11 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión a publicar (semver, sin la v). Ejemplo: 0.2.0'
+        required: true
 
 permissions:
   contents: write
@@ -24,10 +30,18 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Obtener versión de la etiqueta
+      - name: Obtener versión
         id: version
         shell: bash
-        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION_MANUAL: ${{ inputs.version }}
+        run: |
+          version="${VERSION_MANUAL:-${GITHUB_REF_NAME#v}}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Versión no válida: '$version'" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Pruebas
         run: dotnet test -c Release
@@ -65,6 +79,7 @@ jobs:
           vpk upload github
           --repoUrl ${{ github.server_url }}/${{ github.repository }}
           --token ${{ secrets.GITHUB_TOKEN }}
-          --tag ${{ github.ref_name }}
+          --tag v${{ steps.version.outputs.version }}
+          --targetCommitish ${{ github.sha }}
           --releaseName "PrestaGV ${{ steps.version.outputs.version }}"
           --publish
