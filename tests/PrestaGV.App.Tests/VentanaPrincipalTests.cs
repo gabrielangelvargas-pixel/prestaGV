@@ -3,6 +3,7 @@ using System.Runtime.ExceptionServices;
 using PrestaGV.App.Servicios;
 using PrestaGV.App.ViewModels;
 using PrestaGV.Data;
+using Velopack;
 
 namespace PrestaGV.App.Tests;
 
@@ -18,6 +19,9 @@ public sealed class VentanaPrincipalTests : IDisposable
     [Fact]
     public void LaVentanaPrincipalSeConstruyeConLosEstilos()
     {
+        // Igual que Program.Main: Velopack debe inicializarse antes de crear el UpdateManager.
+        VelopackApp.Build().Run();
+
         EnHiloSta(() =>
         {
             var app = new App();
