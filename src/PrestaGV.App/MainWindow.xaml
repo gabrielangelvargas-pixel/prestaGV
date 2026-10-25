@@ -65,6 +65,77 @@
                 </Grid>
             </TabItem>
 
+            <!-- ============ PLANES ============ -->
+            <TabItem Header="Planes" DataContext="{Binding Planes}">
+                <Grid Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Titulo}" Text="{Binding Titulo}" />
+                        <TextBlock Text="Nombre *" />
+                        <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="Frecuencia" />
+                        <ComboBox ItemsSource="{Binding Frecuencias}" SelectedItem="{Binding Frecuencia}" />
+                        <TextBlock Text="Días entre cada cuota" />
+                        <TextBox Text="{Binding DiasEntreCuotas, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="Cantidad de cuotas" />
+                        <TextBox Text="{Binding NumeroCuotas, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="Interés total del plan (%)" />
+                        <TextBox Text="{Binding InteresTotal, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="Redondear cuotas a múltiplos de (0 = sin redondeo)" TextWrapping="Wrap" />
+                        <TextBox Text="{Binding MultiploRedondeo, UpdateSourceTrigger=PropertyChanged}" />
+                        <CheckBox Content="Activo (se ofrece en préstamos nuevos)" IsChecked="{Binding Activo}" Margin="0,2,0,12" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Guardar plan" Command="{Binding GuardarCommand}" />
+                            <Button Content="Nuevo" Command="{Binding NuevoCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="Editar un plan no cambia los préstamos ya creados." TextWrapping="Wrap" Foreground="Gray" Margin="0,12,0,0" />
+                    </StackPanel>
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <DataGrid ItemsSource="{Binding Lista}" SelectedItem="{Binding Seleccionado}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*" />
+                                <DataGridTextColumn Header="Frecuencia" Binding="{Binding Frecuencia}" />
+                                <DataGridTextColumn Header="Cuotas" Binding="{Binding NumeroCuotas}" />
+                                <DataGridTextColumn Header="Cada" Binding="{Binding DiasEntreCuotas, StringFormat={}{0} días}" />
+                                <DataGridTextColumn Header="Interés total %" Binding="{Binding InteresTotalPorcentaje}" />
+                                <DataGridTextColumn Header="Redondeo" Binding="{Binding MultiploRedondeo}" />
+                                <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Activo}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <StackPanel Grid.Row="1" Margin="0,12">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Ejemplo con un préstamo de:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding MontoEjemplo, StringFormat=N2}" Width="120" Margin="0" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding ResumenEjemplo}" Margin="0,8,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <DataGrid Grid.Row="2" ItemsSource="{Binding Ejemplo}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
+                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence}" />
+                                <DataGridTextColumn Header="Capital" Binding="{Binding Capital, StringFormat=N2}" />
+                                <DataGridTextColumn Header="Interés" Binding="{Binding Interes, StringFormat=N2}" />
+                                <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
             <!-- ============ PRÉSTAMOS ============ -->
             <TabItem Header="Préstamos" DataContext="{Binding Prestamos}">
                 <Grid Margin="12">
@@ -79,16 +150,10 @@
                             <TextBlock Style="{StaticResource Titulo}" Text="Nuevo préstamo" />
                             <TextBlock Text="Cliente" />
                             <ComboBox ItemsSource="{Binding Clientes}" SelectedItem="{Binding Cliente}" DisplayMemberPath="NombreCompleto" />
-                            <TextBlock Text="Monto" />
+                            <TextBlock Text="Plan" />
+                            <ComboBox ItemsSource="{Binding Planes}" SelectedItem="{Binding Plan}" DisplayMemberPath="Nombre" />
+                            <TextBlock Text="Monto prestado" />
                             <TextBox Text="{Binding Monto, StringFormat=N2}" />
-                            <TextBlock Text="Tasa de interés mensual (%)" />
-                            <TextBox Text="{Binding TasaMensual}" />
-                            <TextBlock Text="Número de cuotas" />
-                            <TextBox Text="{Binding NumeroCuotas}" />
-                            <TextBlock Text="Frecuencia de pago" />
-                            <ComboBox ItemsSource="{Binding Frecuencias}" SelectedItem="{Binding Frecuencia}" />
-                            <TextBlock Text="Tipo de amortización" />
-                            <ComboBox ItemsSource="{Binding Tipos}" SelectedItem="{Binding Tipo}" />
                             <TextBlock Text="Fecha de inicio" />
                             <DatePicker SelectedDate="{Binding FechaInicio}" />
                             <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
@@ -118,9 +183,10 @@
                                 <DataGridTextColumn Header="#" Binding="{Binding Id}" />
                                 <DataGridTextColumn Header="Cliente" Binding="{Binding Cliente.NombreCompleto}" Width="*" />
                                 <DataGridTextColumn Header="Monto" Binding="{Binding Monto, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Tasa %" Binding="{Binding TasaInteresMensual}" />
+                                <DataGridTextColumn Header="Plan" Binding="{Binding Plan.Nombre}" />
+                                <DataGridTextColumn Header="Interés %" Binding="{Binding InteresTotalPorcentaje}" />
                                 <DataGridTextColumn Header="Cuotas" Binding="{Binding NumeroCuotas}" />
-                                <DataGridTextColumn Header="Frecuencia" Binding="{Binding Frecuencia}" />
+                                <DataGridTextColumn Header="Cada" Binding="{Binding DiasEntreCuotas, StringFormat={}{0} días}" />
                                 <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio}" />
                                 <DataGridTextColumn Header="Saldo" Binding="{Binding SaldoPendiente, StringFormat=N2}" />
                                 <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />

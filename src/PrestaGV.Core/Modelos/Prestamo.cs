@@ -6,14 +6,16 @@ public class Prestamo
     public int ClienteId { get; set; }
     public Cliente? Cliente { get; set; }
 
+    /// <summary>Plan con el que se creó. Sus condiciones se copian abajo para que editar el plan no altere préstamos existentes.</summary>
+    public int? PlanId { get; set; }
+    public Plan? Plan { get; set; }
+
     public decimal Monto { get; set; }
-
-    /// <summary>Tasa de interés mensual en porcentaje (por ejemplo 5 = 5 % mensual).</summary>
-    public decimal TasaInteresMensual { get; set; }
-
+    public decimal InteresTotalPorcentaje { get; set; }
     public int NumeroCuotas { get; set; }
     public FrecuenciaPago Frecuencia { get; set; }
-    public TipoAmortizacion TipoAmortizacion { get; set; }
+    public int DiasEntreCuotas { get; set; }
+    public int MultiploRedondeo { get; set; }
     public DateOnly FechaInicio { get; set; }
     public EstadoPrestamo Estado { get; set; } = EstadoPrestamo.Activo;
     public string? Notas { get; set; }

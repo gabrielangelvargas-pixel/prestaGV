@@ -13,14 +13,17 @@ public partial class MainViewModel : ObservableObject
     {
         _actualizaciones = actualizaciones;
         Clientes = new ClientesViewModel(crearDb);
+        Planes = new PlanesViewModel(crearDb);
         Prestamos = new PrestamosViewModel(crearDb);
         Clientes.ClienteGuardado += (_, _) => Prestamos.CargarClientes();
+        Planes.PlanGuardado += (_, _) => Prestamos.CargarPlanes();
 
         EstadoActualizacion = actualizaciones.EstaInstalada ? string.Empty : "Modo desarrollo: actualizaciones desactivadas";
         _ = BuscarActualizacionesAsync();
     }
 
     public ClientesViewModel Clientes { get; }
+    public PlanesViewModel Planes { get; }
     public PrestamosViewModel Prestamos { get; }
 
     public string Version => $"PrestaGV {_actualizaciones.VersionActual}";

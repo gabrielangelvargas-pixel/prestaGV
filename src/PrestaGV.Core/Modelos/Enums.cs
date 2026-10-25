@@ -1,21 +1,11 @@
 namespace PrestaGV.Core.Modelos;
 
-/// <summary>Cada cuánto se paga una cuota.</summary>
+/// <summary>Etiqueta del plan. Los días reales entre cuotas se guardan en <see cref="Plan.DiasEntreCuotas"/>.</summary>
 public enum FrecuenciaPago
 {
     Semanal = 0,
     Quincenal = 1,
     Mensual = 2,
-}
-
-/// <summary>Cómo se reparte el interés entre las cuotas.</summary>
-public enum TipoAmortizacion
-{
-    /// <summary>Cuota fija; el interés se calcula sobre el saldo pendiente (sistema francés).</summary>
-    Frances = 0,
-
-    /// <summary>Interés fijo sobre el monto original, repartido en partes iguales.</summary>
-    InteresSimple = 1,
 }
 
 public enum EstadoPrestamo
