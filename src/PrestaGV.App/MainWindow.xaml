@@ -3,217 +3,310 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:PrestaGV.App.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PrestaGV" Height="720" Width="1180" WindowStartupLocation="CenterScreen">
+        Title="PrestaGV" Height="760" Width="1280" MinHeight="600" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialDesign.Brush.Background}"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        TextElement.FontSize="14"
+        FontFamily="{materialDesign:MaterialDesignFont}">
     <DockPanel>
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="{Binding Version}" />
-            <Separator />
-            <StatusBarItem Content="{Binding EstadoActualizacion}" />
-            <StatusBarItem HorizontalAlignment="Right">
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Buscar actualizaciones" Command="{Binding BuscarActualizacionesCommand}" />
-                    <Button Content="Reiniciar y actualizar" Command="{Binding ReiniciarParaActualizarCommand}" />
+        <!-- ============ BARRA INFERIOR: versión y actualizaciones ============ -->
+        <Border DockPanel.Dock="Bottom" Padding="16,6"
+                Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
+                BorderBrush="{DynamicResource MaterialDesign.Brush.Separator.Background}" BorderThickness="0,1,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding BuscarActualizacionesCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Refresh" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Buscar actualizaciones" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ReiniciarParaActualizarCommand}" Margin="8,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Download" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="Reiniciar y actualizar" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-            </StatusBarItem>
-        </StatusBar>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Version}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding EstadoActualizacion}" Margin="16,0,0,0" Style="{StaticResource Nota}" VerticalAlignment="Center" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
 
-        <TabControl Margin="8">
+        <!-- ============ NAVEGACIÓN LATERAL ============ -->
+        <TabControl Style="{StaticResource MaterialDesignNavigationRailTabControl}"
+                    TabStripPlacement="Left"
+                    materialDesign:ColorZoneAssist.Mode="PrimaryMid"
+                    materialDesign:NavigationRailAssist.ShowSelectionBackground="True">
+
             <!-- ============ CLIENTES ============ -->
-            <TabItem Header="Clientes" DataContext="{Binding Clientes}">
-                <Grid Margin="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Titulo}" Text="Nuevo cliente" />
-                        <TextBlock Text="Nombres *" />
-                        <TextBox Text="{Binding Nombres, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Apellidos *" />
-                        <TextBox Text="{Binding Apellidos, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Documento de identidad *" />
-                        <TextBox Text="{Binding Documento, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Teléfono" />
-                        <TextBox Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Correo electrónico" />
-                        <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Dirección" />
-                        <TextBox Text="{Binding Direccion, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Content="Guardar cliente" Command="{Binding GuardarCommand}" HorizontalAlignment="Left" />
+            <TabItem DataContext="{Binding Clientes}">
+                <TabItem.Header>
+                    <StackPanel Width="88">
+                        <materialDesign:PackIcon Kind="AccountMultiple" Width="26" Height="26" HorizontalAlignment="Center" />
+                        <TextBlock Text="Clientes" HorizontalAlignment="Center" Margin="0,4,0,0" />
                     </StackPanel>
+                </TabItem.Header>
+                <DockPanel Margin="16">
+                    <TextBlock DockPanel.Dock="Top" Text="Clientes" Style="{StaticResource Encabezado}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="340" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <DockPanel Grid.Column="2">
-                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                            <TextBlock Text="Buscar:" VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBox Text="{Binding Busqueda, UpdateSourceTrigger=PropertyChanged, Delay=300}" Margin="0" />
-                        </DockPanel>
-                        <DataGrid ItemsSource="{Binding Lista}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Documento" Binding="{Binding Documento}" Width="130" />
-                                <DataGridTextColumn Header="Nombre" Binding="{Binding NombreCompleto}" Width="*" />
-                                <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="120" />
-                                <DataGridTextColumn Header="Correo" Binding="{Binding Email}" Width="180" />
-                                <DataGridTextColumn Header="Registro" Binding="{Binding FechaRegistro, StringFormat=dd/MM/yyyy}" Width="100" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
-                </Grid>
+                        <materialDesign:Card Style="{StaticResource Tarjeta}" VerticalAlignment="Top">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Titulo}" Text="Nuevo cliente" />
+                                <TextBox materialDesign:HintAssist.Hint="Nombres *" Text="{Binding Nombres, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox materialDesign:HintAssist.Hint="Apellidos *" Text="{Binding Apellidos, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox materialDesign:HintAssist.Hint="Documento de identidad *" Text="{Binding Documento, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox materialDesign:HintAssist.Hint="Teléfono" Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox materialDesign:HintAssist.Hint="Correo electrónico" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox materialDesign:HintAssist.Hint="Dirección" Text="{Binding Direccion, UpdateSourceTrigger=PropertyChanged}" />
+                                <StackPanel Style="{StaticResource BotonesFormulario}">
+                                    <Button Command="{Binding GuardarCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                            <TextBlock Text="Guardar cliente" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                        <materialDesign:Card Grid.Column="1" Style="{StaticResource Tarjeta}">
+                            <DockPanel>
+                                <TextBox DockPanel.Dock="Top" MaxWidth="360" HorizontalAlignment="Left" Width="360"
+                                         materialDesign:HintAssist.Hint="Buscar por nombre o documento"
+                                         materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                                         materialDesign:TextFieldAssist.LeadingIcon="Magnify"
+                                         Text="{Binding Busqueda, UpdateSourceTrigger=PropertyChanged, Delay=300}" />
+                                <DataGrid ItemsSource="{Binding Lista}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Documento" Binding="{Binding Documento}" Width="140" />
+                                        <DataGridTextColumn Header="Nombre" Binding="{Binding NombreCompleto}" Width="*" />
+                                        <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="130" />
+                                        <DataGridTextColumn Header="Correo" Binding="{Binding Email}" Width="200" />
+                                        <DataGridTextColumn Header="Registro" Binding="{Binding FechaRegistro, StringFormat=dd/MM/yyyy}" Width="110" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </materialDesign:Card>
+                    </Grid>
+                </DockPanel>
             </TabItem>
 
             <!-- ============ PLANES ============ -->
-            <TabItem Header="Planes" DataContext="{Binding Planes}">
-                <Grid Margin="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource Titulo}" Text="{Binding Titulo}" />
-                        <TextBlock Text="Nombre *" />
-                        <TextBox Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Frecuencia" />
-                        <ComboBox ItemsSource="{Binding Frecuencias}" SelectedItem="{Binding Frecuencia}" />
-                        <TextBlock Text="Días entre cada cuota" />
-                        <TextBox Text="{Binding DiasEntreCuotas, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Cantidad de cuotas" />
-                        <TextBox Text="{Binding NumeroCuotas, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Interés total del plan (%)" />
-                        <TextBox Text="{Binding InteresTotal, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Text="Redondear cuotas a múltiplos de (0 = sin redondeo)" TextWrapping="Wrap" />
-                        <TextBox Text="{Binding MultiploRedondeo, UpdateSourceTrigger=PropertyChanged}" />
-                        <CheckBox Content="Activo (se ofrece en préstamos nuevos)" IsChecked="{Binding Activo}" Margin="0,2,0,12" />
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Guardar plan" Command="{Binding GuardarCommand}" />
-                            <Button Content="Nuevo" Command="{Binding NuevoCommand}" />
-                        </StackPanel>
-                        <TextBlock Text="Editar un plan no cambia los préstamos ya creados." TextWrapping="Wrap" Foreground="Gray" Margin="0,12,0,0" />
+            <TabItem DataContext="{Binding Planes}">
+                <TabItem.Header>
+                    <StackPanel Width="88">
+                        <materialDesign:PackIcon Kind="CalendarClock" Width="26" Height="26" HorizontalAlignment="Center" />
+                        <TextBlock Text="Planes" HorizontalAlignment="Center" Margin="0,4,0,0" />
                     </StackPanel>
+                </TabItem.Header>
+                <DockPanel Margin="16">
+                    <TextBlock DockPanel.Dock="Top" Text="Planes de préstamo" Style="{StaticResource Encabezado}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="340" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <DataGrid ItemsSource="{Binding Lista}" SelectedItem="{Binding Seleccionado}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*" />
-                                <DataGridTextColumn Header="Frecuencia" Binding="{Binding Frecuencia}" />
-                                <DataGridTextColumn Header="Cuotas" Binding="{Binding NumeroCuotas}" />
-                                <DataGridTextColumn Header="Cada" Binding="{Binding DiasEntreCuotas, StringFormat={}{0} días}" />
-                                <DataGridTextColumn Header="Interés total %" Binding="{Binding InteresTotalPorcentaje}" />
-                                <DataGridTextColumn Header="Redondeo" Binding="{Binding MultiploRedondeo}" />
-                                <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Activo}" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-
-                        <StackPanel Grid.Row="1" Margin="0,12">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Ejemplo con un préstamo de:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" />
-                                <TextBox Text="{Binding MontoEjemplo, StringFormat=N2}" Width="120" Margin="0" />
+                        <materialDesign:Card Style="{StaticResource Tarjeta}" VerticalAlignment="Top">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Titulo}" Text="{Binding Titulo}" />
+                                <TextBox materialDesign:HintAssist.Hint="Nombre *" Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+                                <ComboBox materialDesign:HintAssist.Hint="Frecuencia" ItemsSource="{Binding Frecuencias}" SelectedItem="{Binding Frecuencia}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox materialDesign:HintAssist.Hint="Días entre cuotas" Text="{Binding DiasEntreCuotas, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Grid.Column="2" materialDesign:HintAssist.Hint="Cantidad de cuotas" Text="{Binding NumeroCuotas, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox materialDesign:HintAssist.Hint="Interés total (%)" Text="{Binding InteresTotal, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Grid.Column="2" materialDesign:HintAssist.Hint="Redondear a múltiplos de"
+                                             materialDesign:HintAssist.HelperText="0 = sin redondeo"
+                                             Text="{Binding MultiploRedondeo, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+                                <CheckBox Content="Activo (se ofrece en préstamos nuevos)" IsChecked="{Binding Activo}" Margin="0,4,0,16" />
+                                <StackPanel Style="{StaticResource BotonesFormulario}">
+                                    <Button Command="{Binding GuardarCommand}" Margin="0,0,8,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                            <TextBlock Text="Guardar plan" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding NuevoCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="Plus" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                            <TextBlock Text="Nuevo" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Text="Editar un plan no cambia los préstamos ya creados." Style="{StaticResource Nota}" Margin="0,16,0,0" />
                             </StackPanel>
-                            <TextBlock Text="{Binding ResumenEjemplo}" Margin="0,8,0,0" TextWrapping="Wrap" />
-                        </StackPanel>
+                        </materialDesign:Card>
 
-                        <DataGrid Grid.Row="2" ItemsSource="{Binding Ejemplo}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
-                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
-                                <DataGridTextColumn Header="Capital" Binding="{Binding Capital, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Interés" Binding="{Binding Interes, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" Width="*" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <materialDesign:Card Style="{StaticResource Tarjeta}">
+                                <DataGrid ItemsSource="{Binding Lista}" SelectedItem="{Binding Seleccionado}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*" />
+                                        <DataGridTextColumn Header="Frecuencia" Binding="{Binding Frecuencia}" />
+                                        <DataGridTextColumn Header="Cuotas" Binding="{Binding NumeroCuotas}" ElementStyle="{StaticResource CeldaNumero}" />
+                                        <DataGridTextColumn Header="Cada" Binding="{Binding DiasEntreCuotas, StringFormat={}{0} días}" />
+                                        <DataGridTextColumn Header="Interés total" Binding="{Binding InteresTotalPorcentaje, StringFormat={}{0} %}" ElementStyle="{StaticResource CeldaNumero}" />
+                                        <DataGridTextColumn Header="Redondeo" Binding="{Binding MultiploRedondeo}" ElementStyle="{StaticResource CeldaNumero}" />
+                                        <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Activo}" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </materialDesign:Card>
+
+                            <materialDesign:Card Grid.Row="1" Style="{StaticResource Tarjeta}">
+                                <DockPanel>
+                                    <DockPanel DockPanel.Dock="Top">
+                                        <TextBox DockPanel.Dock="Left" Width="200" materialDesign:HintAssist.Hint="Simular un préstamo de"
+                                                 Text="{Binding MontoEjemplo, StringFormat=N2}" />
+                                        <TextBlock Text="{Binding ResumenEjemplo}" Margin="16,0,0,14" VerticalAlignment="Center"
+                                                   TextWrapping="Wrap" FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
+                                    </DockPanel>
+                                    <DataGrid ItemsSource="{Binding Ejemplo}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
+                                            <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
+                                            <DataGridTextColumn Header="Capital" Binding="{Binding Capital, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                            <DataGridTextColumn Header="Interés" Binding="{Binding Interes, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                            <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" FontWeight="SemiBold" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </DockPanel>
+                            </materialDesign:Card>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </DockPanel>
             </TabItem>
 
             <!-- ============ PRÉSTAMOS ============ -->
-            <TabItem Header="Préstamos" DataContext="{Binding Prestamos}">
-                <Grid Margin="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <TabItem DataContext="{Binding Prestamos}">
+                <TabItem.Header>
+                    <StackPanel Width="88">
+                        <materialDesign:PackIcon Kind="CashMultiple" Width="26" Height="26" HorizontalAlignment="Center" />
+                        <TextBlock Text="Préstamos" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                    </StackPanel>
+                </TabItem.Header>
+                <DockPanel Margin="16">
+                    <TextBlock DockPanel.Dock="Top" Text="Préstamos" Style="{StaticResource Encabezado}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="340" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <DockPanel>
-                        <StackPanel DockPanel.Dock="Top">
-                            <TextBlock Style="{StaticResource Titulo}" Text="Nuevo préstamo" />
-                            <TextBlock Text="Cliente" />
-                            <ComboBox ItemsSource="{Binding Clientes}" SelectedItem="{Binding Cliente}" DisplayMemberPath="NombreCompleto" />
-                            <TextBlock Text="Plan" />
-                            <ComboBox ItemsSource="{Binding Planes}" SelectedItem="{Binding Plan}" DisplayMemberPath="Nombre" />
-                            <TextBlock Text="Monto prestado" />
-                            <TextBox Text="{Binding Monto, StringFormat=N2}" />
-                            <TextBlock Text="Fecha de inicio" />
-                            <DatePicker SelectedDate="{Binding FechaInicio}" />
-                            <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
-                                <Button Content="Calcular" Command="{Binding CalcularCommand}" />
-                                <Button Content="Crear préstamo" Command="{Binding CrearCommand}" />
-                            </StackPanel>
-                            <TextBlock Text="{Binding ResumenVistaPrevia}" TextWrapping="Wrap" Margin="0,0,0,8" />
-                        </StackPanel>
-                        <DataGrid ItemsSource="{Binding VistaPrevia}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
-                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
-                                <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" Width="*" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
+                        <materialDesign:Card Style="{StaticResource Tarjeta}">
+                            <DockPanel>
+                                <StackPanel DockPanel.Dock="Top">
+                                    <TextBlock Style="{StaticResource Titulo}" Text="Nuevo préstamo" />
+                                    <ComboBox materialDesign:HintAssist.Hint="Cliente" ItemsSource="{Binding Clientes}" SelectedItem="{Binding Cliente}" DisplayMemberPath="NombreCompleto" />
+                                    <ComboBox materialDesign:HintAssist.Hint="Plan" ItemsSource="{Binding Planes}" SelectedItem="{Binding Plan}" DisplayMemberPath="Nombre" />
+                                    <TextBox materialDesign:HintAssist.Hint="Monto prestado" Text="{Binding Monto, StringFormat=N2}" />
+                                    <DatePicker materialDesign:HintAssist.Hint="Fecha de inicio" SelectedDate="{Binding FechaInicio}" />
+                                    <StackPanel Style="{StaticResource BotonesFormulario}">
+                                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding CalcularCommand}" Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Calculator" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                                <TextBlock Text="Calcular" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Command="{Binding CrearCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Check" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                                <TextBlock Text="Crear préstamo" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ResumenVistaPrevia}" TextWrapping="Wrap" Margin="0,16,0,8"
+                                               FontWeight="SemiBold" Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
+                                </StackPanel>
+                                <DataGrid ItemsSource="{Binding VistaPrevia}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
+                                        <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
+                                        <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" Width="*" ElementStyle="{StaticResource CeldaNumero}" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </materialDesign:Card>
 
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                        <DataGrid ItemsSource="{Binding Lista}" SelectedItem="{Binding Seleccionado}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="#" Binding="{Binding Id}" />
-                                <DataGridTextColumn Header="Cliente" Binding="{Binding Cliente.NombreCompleto}" Width="*" />
-                                <DataGridTextColumn Header="Monto" Binding="{Binding Monto, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Plan" Binding="{Binding Plan.Nombre}" />
-                                <DataGridTextColumn Header="Interés %" Binding="{Binding InteresTotalPorcentaje}" />
-                                <DataGridTextColumn Header="Cuotas" Binding="{Binding NumeroCuotas}" />
-                                <DataGridTextColumn Header="Cada" Binding="{Binding DiasEntreCuotas, StringFormat={}{0} días}" />
-                                <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy}" />
-                                <DataGridTextColumn Header="Saldo" Binding="{Binding SaldoPendiente, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                            <materialDesign:Card Style="{StaticResource Tarjeta}">
+                                <DataGrid ItemsSource="{Binding Lista}" SelectedItem="{Binding Seleccionado}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="#" Binding="{Binding Id}" />
+                                        <DataGridTextColumn Header="Cliente" Binding="{Binding Cliente.NombreCompleto}" Width="*" />
+                                        <DataGridTextColumn Header="Plan" Binding="{Binding Plan.Nombre}" />
+                                        <DataGridTextColumn Header="Monto" Binding="{Binding Monto, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                        <DataGridTextColumn Header="Inicio" Binding="{Binding FechaInicio, StringFormat=dd/MM/yyyy}" />
+                                        <DataGridTextColumn Header="Saldo" Binding="{Binding SaldoPendiente, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                        <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </materialDesign:Card>
 
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12">
-                            <TextBlock Text="Registrar pago:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold" />
-                            <TextBox Text="{Binding MontoPago, StringFormat=N2}" Width="120" Margin="0,0,8,0" />
-                            <DatePicker SelectedDate="{Binding FechaPago}" Margin="0,0,8,0" />
-                            <Button Content="Registrar" Command="{Binding RegistrarPagoCommand}" />
-                        </StackPanel>
-
-                        <DataGrid Grid.Row="2" ItemsSource="{Binding CuotasSeleccionado}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
-                                <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
-                                <DataGridTextColumn Header="Capital" Binding="{Binding Capital, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Interés" Binding="{Binding Interes, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Pagado" Binding="{Binding Pagado, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Pendiente" Binding="{Binding Pendiente, StringFormat=N2}" />
-                                <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                            <materialDesign:Card Grid.Row="1" Style="{StaticResource Tarjeta}">
+                                <DockPanel>
+                                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                                        <TextBlock Text="Registrar pago" Style="{StaticResource Titulo}" VerticalAlignment="Center" Margin="0,0,16,14" />
+                                        <TextBox Width="150" materialDesign:HintAssist.Hint="Monto" Text="{Binding MontoPago, StringFormat=N2}" Margin="0,0,12,14" />
+                                        <DatePicker Width="160" materialDesign:HintAssist.Hint="Fecha" SelectedDate="{Binding FechaPago}" Margin="0,0,12,14" />
+                                        <Button Command="{Binding RegistrarPagoCommand}" VerticalAlignment="Center" Margin="0,0,0,14">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="CashPlus" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                                <TextBlock Text="Registrar" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                    <DataGrid ItemsSource="{Binding CuotasSeleccionado}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="#" Binding="{Binding Numero}" />
+                                            <DataGridTextColumn Header="Vence" Binding="{Binding Vence, StringFormat=dd/MM/yyyy}" />
+                                            <DataGridTextColumn Header="Cuota" Binding="{Binding Monto, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                            <DataGridTextColumn Header="Pagado" Binding="{Binding Pagado, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                            <DataGridTextColumn Header="Pendiente" Binding="{Binding Pendiente, StringFormat=N2}" ElementStyle="{StaticResource CeldaNumero}" />
+                                            <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </DockPanel>
+                            </materialDesign:Card>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>
