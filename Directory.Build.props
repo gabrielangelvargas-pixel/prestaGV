@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Permite compilar el proyecto WPF desde Linux/macOS (por ejemplo en CI). -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <Version>0.1.0</Version>
+    <Company>PrestaGV</Company>
+    <Product>PrestaGV</Product>
+    <Copyright>© PrestaGV</Copyright>
+  </PropertyGroup>
+</Project>
