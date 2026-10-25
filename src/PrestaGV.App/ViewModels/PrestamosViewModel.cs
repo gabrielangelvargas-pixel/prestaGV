@@ -17,24 +17,20 @@ public partial class PrestamosViewModel : ObservableObject
     {
         _crearDb = crearDb;
         CargarClientes();
+        CargarPlanes();
         CargarPrestamos();
     }
 
     public ObservableCollection<Cliente> Clientes { get; } = [];
+    public ObservableCollection<Plan> Planes { get; } = [];
     public ObservableCollection<Prestamo> Lista { get; } = [];
     public ObservableCollection<CuotaFila> CuotasSeleccionado { get; } = [];
     public ObservableCollection<CuotaFila> VistaPrevia { get; } = [];
 
-    public FrecuenciaPago[] Frecuencias { get; } = Enum.GetValues<FrecuenciaPago>();
-    public TipoAmortizacion[] Tipos { get; } = Enum.GetValues<TipoAmortizacion>();
-
     // Formulario de nuevo préstamo
     [ObservableProperty] private Cliente? _cliente;
+    [ObservableProperty] private Plan? _plan;
     [ObservableProperty] private decimal _monto = 10_000m;
-    [ObservableProperty] private decimal _tasaMensual = 5m;
-    [ObservableProperty] private int _numeroCuotas = 12;
-    [ObservableProperty] private FrecuenciaPago _frecuencia = FrecuenciaPago.Mensual;
-    [ObservableProperty] private TipoAmortizacion _tipo = TipoAmortizacion.Frances;
     [ObservableProperty] private DateTime _fechaInicio = DateTime.Today;
     [ObservableProperty] private string _resumenVistaPrevia = string.Empty;
 
@@ -63,11 +59,22 @@ public partial class PrestamosViewModel : ObservableObject
             Clientes.Add(c);
     }
 
+    public void CargarPlanes()
+    {
+        var seleccionadoId = Plan?.Id;
+        using var db = _crearDb();
+        Planes.Clear();
+        foreach (var p in db.Planes.AsNoTracking().Where(p => p.Activo).OrderBy(p => p.Nombre))
+            Planes.Add(p);
+        Plan = Planes.FirstOrDefault(p => p.Id == seleccionadoId) ?? Planes.FirstOrDefault();
+    }
+
     private void CargarPrestamos(int? seleccionarId = null)
     {
         using var db = _crearDb();
         var prestamos = db.Prestamos.AsNoTracking()
             .Include(p => p.Cliente)
+            .Include(p => p.Plan)
             .Include(p => p.Cuotas)
             .OrderByDescending(p => p.Id)
             .ToList();
@@ -81,11 +88,17 @@ public partial class PrestamosViewModel : ObservableObject
     private void Calcular()
     {
         VistaPrevia.Clear();
+        if (Plan is null)
+        {
+            ResumenVistaPrevia = "Selecciona un plan.";
+            return;
+        }
+
         try
         {
-            var cuotas = CalculadoraAmortizacion.GenerarCuotas(Monto, TasaMensual, NumeroCuotas, Frecuencia, Tipo, DateOnly.FromDateTime(FechaInicio));
+            var cuotas = CalculadoraCuotas.Generar(Monto, Plan, DateOnly.FromDateTime(FechaInicio));
             foreach (var c in cuotas) VistaPrevia.Add(CuotaFila.Desde(c));
-            ResumenVistaPrevia = $"Total a pagar: {cuotas.Sum(c => c.Monto):N2}   Intereses: {cuotas.Sum(c => c.Interes):N2}";
+            ResumenVistaPrevia = $"Total a devolver: {cuotas.Sum(c => c.Monto):N2}\n{Formato.Cuotas(cuotas)}";
         }
         catch (ArgumentException ex)
         {
@@ -96,15 +109,25 @@ public partial class PrestamosViewModel : ObservableObject
     [RelayCommand]
     private void Crear()
     {
-        if (Cliente is null)
+        if (Cliente is null || Plan is null)
         {
-            MessageBox.Show("Selecciona un cliente.", "Préstamos", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Selecciona un cliente y un plan.", "Préstamos", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
         using var db = _crearDb();
         var cliente = db.Clientes.Find(Cliente.Id)!;
-        var prestamo = ServicioPrestamos.Crear(cliente, Monto, TasaMensual, NumeroCuotas, Frecuencia, Tipo, DateOnly.FromDateTime(FechaInicio));
+        var plan = db.Planes.Find(Plan.Id)!;
+        Prestamo prestamo;
+        try
+        {
+            prestamo = ServicioPrestamos.Crear(cliente, plan, Monto, DateOnly.FromDateTime(FechaInicio));
+        }
+        catch (ArgumentException ex)
+        {
+            MessageBox.Show(ex.Message, "Préstamos", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         db.Prestamos.Add(prestamo);
         db.SaveChanges();
 

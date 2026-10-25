@@ -28,12 +28,13 @@ tests/
 
 ## Reglas de negocio
 
-- **Tasa de interés**: se introduce como porcentaje **mensual**. Para pagos semanales o quincenales
-  se convierte al período (5 % mensual = 2,5 % quincenal).
-- **Tipos de amortización**:
-  - *Francés*: cuota fija; el interés se calcula sobre el saldo pendiente.
-  - *Interés simple*: el interés total es `monto × tasa × cuotas` y se reparte en partes iguales.
-- **Redondeo**: todo se redondea a 2 decimales; la última cuota absorbe la diferencia.
+- **Planes**: cada préstamo se crea a partir de un plan (pestaña *Planes*) que define la frecuencia,
+  la cantidad de cuotas, los días entre cuotas, el **interés total** y el múltiplo de redondeo.
+  Las condiciones se copian al préstamo, así que editar un plan no cambia préstamos ya creados.
+- **Cálculo de cuotas**: total a devolver = `monto × (1 + interés total)`. Todas las cuotas menos la
+  última se redondean **hacia arriba** al múltiplo del plan y la última se ajusta a lo que falta.
+  Ejemplo: 10.000 al 60 % en 6 cuotas → devuelve 16.000 en 5 x 2.670 y 1 x 2.650.
+- **Vencimientos**: la cuota *n* vence `n × días entre cuotas` después de la fecha de inicio.
 - **Pagos**: se aplican a la cuota pendiente más antigua. Un pago no puede superar el saldo.
   Cuando el saldo llega a cero el préstamo pasa a *Saldado*.
 - **Base de datos**: `%LocalAppData%\PrestaGV\prestagv.db`, fuera de la carpeta de instalación

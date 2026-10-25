@@ -121,6 +121,58 @@ namespace PrestaGV.Data.Migraciones
                     b.ToTable("Pagos");
                 });
 
+            modelBuilder.Entity("PrestaGV.Core.Modelos.Plan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DiasEntreCuotas")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Frecuencia")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("InteresTotalPorcentaje")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MultiploRedondeo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("NumeroCuotas")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Planes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Activo = true,
+                            DiasEntreCuotas = 7,
+                            Frecuencia = "Semanal",
+                            InteresTotalPorcentaje = 60m,
+                            MultiploRedondeo = 10,
+                            Nombre = "Semanal 6 cuotas 60 %",
+                            NumeroCuotas = 6
+                        });
+                });
+
             modelBuilder.Entity("PrestaGV.Core.Modelos.Prestamo", b =>
                 {
                     b.Property<int>("Id")
@@ -128,6 +180,9 @@ namespace PrestaGV.Data.Migraciones
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ClienteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DiasEntreCuotas")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Estado")
@@ -143,8 +198,14 @@ namespace PrestaGV.Data.Migraciones
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("InteresTotalPorcentaje")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Monto")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("MultiploRedondeo")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Notas")
                         .HasColumnType("TEXT");
@@ -152,17 +213,14 @@ namespace PrestaGV.Data.Migraciones
                     b.Property<int>("NumeroCuotas")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("TasaInteresMensual")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TipoAmortizacion")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("PlanId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
+
+                    b.HasIndex("PlanId");
 
                     b.ToTable("Prestamos");
                 });
@@ -197,7 +255,14 @@ namespace PrestaGV.Data.Migraciones
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PrestaGV.Core.Modelos.Plan", "Plan")
+                        .WithMany()
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("Plan");
                 });
 
             modelBuilder.Entity("PrestaGV.Core.Modelos.Cliente", b =>

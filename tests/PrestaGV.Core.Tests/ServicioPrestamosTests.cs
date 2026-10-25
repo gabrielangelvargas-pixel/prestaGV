@@ -5,9 +5,27 @@ namespace PrestaGV.Core.Tests;
 
 public class ServicioPrestamosTests
 {
+    // 10.000 al 40 % en 4 cuotas mensuales → 4 x 3.500.
+    private static readonly Plan Plan = new()
+    {
+        Id = 7, Nombre = "Mensual 4", Frecuencia = FrecuenciaPago.Mensual, NumeroCuotas = 4,
+        DiasEntreCuotas = 31, InteresTotalPorcentaje = 40m, MultiploRedondeo = 10,
+    };
+
     private static Prestamo NuevoPrestamo() => ServicioPrestamos.Crear(
-        new Cliente { Nombres = "Ana", Apellidos = "Pérez", Documento = "001" },
-        10_000m, 10m, 4, FrecuenciaPago.Mensual, TipoAmortizacion.InteresSimple, new DateOnly(2026, 1, 1));
+        new Cliente { Nombres = "Ana", Apellidos = "Pérez", Documento = "001" }, Plan, 10_000m, new DateOnly(2026, 1, 1));
+
+    [Fact]
+    public void Crear_CopiaLasCondicionesDelPlan()
+    {
+        var prestamo = NuevoPrestamo();
+
+        Assert.Equal(7, prestamo.PlanId);
+        Assert.Equal(40m, prestamo.InteresTotalPorcentaje);
+        Assert.Equal(4, prestamo.NumeroCuotas);
+        Assert.Equal(31, prestamo.DiasEntreCuotas);
+        Assert.Equal(14_000m, prestamo.TotalAPagar);
+    }
 
     [Fact]
     public void Pago_SeAplicaALaCuotaMasAntigua()

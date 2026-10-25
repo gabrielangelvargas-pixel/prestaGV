@@ -4,27 +4,23 @@ namespace PrestaGV.Core.Servicios;
 
 public static class ServicioPrestamos
 {
-    /// <summary>Crea un préstamo con su calendario de cuotas ya calculado.</summary>
-    public static Prestamo Crear(
-        Cliente cliente,
-        decimal monto,
-        decimal tasaMensualPorcentaje,
-        int numeroCuotas,
-        FrecuenciaPago frecuencia,
-        TipoAmortizacion tipo,
-        DateOnly fechaInicio)
+    /// <summary>Crea un préstamo con las condiciones del plan y su calendario de cuotas ya calculado.</summary>
+    public static Prestamo Crear(Cliente cliente, Plan plan, decimal monto, DateOnly fechaInicio)
     {
         return new Prestamo
         {
             Cliente = cliente,
             ClienteId = cliente.Id,
+            Plan = plan,
+            PlanId = plan.Id,
             Monto = monto,
-            TasaInteresMensual = tasaMensualPorcentaje,
-            NumeroCuotas = numeroCuotas,
-            Frecuencia = frecuencia,
-            TipoAmortizacion = tipo,
+            InteresTotalPorcentaje = plan.InteresTotalPorcentaje,
+            NumeroCuotas = plan.NumeroCuotas,
+            Frecuencia = plan.Frecuencia,
+            DiasEntreCuotas = plan.DiasEntreCuotas,
+            MultiploRedondeo = plan.MultiploRedondeo,
             FechaInicio = fechaInicio,
-            Cuotas = CalculadoraAmortizacion.GenerarCuotas(monto, tasaMensualPorcentaje, numeroCuotas, frecuencia, tipo, fechaInicio),
+            Cuotas = CalculadoraCuotas.Generar(monto, plan, fechaInicio),
         };
     }
 
