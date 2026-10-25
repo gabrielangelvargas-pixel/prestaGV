@@ -64,10 +64,11 @@ La CI falla si el modelo cambia y falta la migración.
 
 ## Publicar una versión
 
-1. Crea y sube una etiqueta con la versión (semver):
+1. En GitHub ve a **Actions > Release > Run workflow** y escribe la versión (semver, por ejemplo
+   `0.2.0`). También se puede lanzar subiendo una etiqueta:
    ```powershell
-   git tag v0.1.0
-   git push origin v0.1.0
+   git tag v0.2.0
+   git push origin v0.2.0
    ```
 2. El workflow **Release** compila, ejecuta las pruebas, empaqueta con Velopack y publica en
    GitHub Releases:
